@@ -11,32 +11,53 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { FormValues } from "../page";
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { ExperienceFormValues } from "./types";
+import { Field,FieldLabel } from "@/components/ui/field";
 
-const ExperienceStep = () => {
+
+
+
+
+interface Props {
+  initialData:ExperienceFormValues
+  onNext:(data:ExperienceFormValues)=>void
+  onPrev:()=>void
+}
+
+const ExperienceStep = ({initialData,onNext,onPrev}:Props) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm<FormValues>({ mode: "onChange" });
+    getValues
+  } = useForm<ExperienceFormValues>({ mode: "onChange",defaultValues:initialData });
 
-   const onSubmit = (data: FormValues) => {
+   const onSubmit = (data: ExperienceFormValues) => {
         console.log({ data });
+        onNext(data)
       };
+    const onPrevious = ()=>{
+      onPrev()
+    }
 
         useEffect(() => {
           register("experience", { required: "This field is required" });
-          register("skill", { required: "Slect at least one skill " });
         }, [register]);
 
   return (
     <div>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-        <div>
-          <span>Years of Experience</span>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+        <div className="flex flex-col h-[60]">
+         <Field>
+            <FieldLabel>
+            Experience
+            </FieldLabel>
+          </Field>
           <Select
+          value={getValues("experience")}
             onValueChange={(value) =>
               setValue("experience", value, {
                 shouldValidate: true,
@@ -58,8 +79,12 @@ const ExperienceStep = () => {
           </Select>
            <span className="text-destructive">{errors.experience?.message}</span>
         </div>
-        <div>
-          <span>Curret role</span>
+        <div className="flex flex-col h-[60]">
+          <Field>
+            <FieldLabel>
+            Role
+            </FieldLabel>
+          </Field>
           <Input
             placeholder="Frontend devloper"
             {...register("role", {
@@ -72,6 +97,10 @@ const ExperienceStep = () => {
             })}
           />
         </div>
+        <div className="flex justify-center">
+        <Button  className="bg-blue-400 p-4" type="button" onClick={onPrevious}>Previous</Button>
+        <Button  className="bg-blue-400 p-4" type="submit">Next</Button>
+      </div>
       </form>
     </div>
   );
